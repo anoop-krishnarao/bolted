@@ -1,12 +1,32 @@
 package dev.anoopkrishnarao.bolted;
 
+import dev.anoopkrishnarao.bolted.keybind.BoltedKeybinds;
+import dev.anoopkrishnarao.bolted.network.LockPacketClient;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 public class BoltedClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        BoltedKeybinds.register();
+        registerTickHandler();
         Bolted.LOGGER.info("[Bolted] Client initialized.");
-        // Keybinds and rendering registered in later milestones
+    }
+
+    private void registerTickHandler() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (BoltedKeybinds.LOCK_KEY.consumeClick()) {
+                if (client.player == null || client.level == null) return;
+
+                HitResult hit = client.hitResult;
+                if (hit == null || hit.getType() != HitResult.Type.BLOCK) return;
+
+                BlockHitResult blockHit = (BlockHitResult) hit;
+                LockPacketClient.send(blockHit.getBlockPos());
+            }
+        });
     }
 }
