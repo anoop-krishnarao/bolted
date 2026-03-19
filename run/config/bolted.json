@@ -1,7 +1,0 @@
-{
-  "lockSound": true,
-  "showIndicator": true,
-  "showActionBarMessage": true,
-  "lockedBlocksDisableRedstone": true,
-  "entityLockedDisableRedstone": false
-}
